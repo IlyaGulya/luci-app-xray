@@ -13,14 +13,19 @@ env:
 jobs:
   release:
     name: Build for ${{ matrix.arch }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - arch: x86_64
-            sdk_url_path: https://downloads.openwrt.org/releases/23.05.5/targets/x86/64
-            sdk_name: -sdk-23.05.5-x86-64_
+            sdk_url_path: https://downloads.openwrt.org/releases/24.10.0/targets/x86/64
+            sdk_name: -sdk-24.10.0-x86-64_
+            runner: ubuntu-latest
+          - arch: armv8
+            sdk_url_path: https://mirror-03.infra.openwrt.org/releases/24.10.0/targets/armsr/armv8/
+            sdk_name: -sdk-24.10.0-armsr-armv8_
+            runner: ubuntu-24.04-arm
 
     env:
       SDK_URL_PATH: ${{ matrix.sdk_url_path }}
@@ -33,10 +38,10 @@ jobs:
 
       - name: Prepare Cache Key
         id: cache_key
-        run: echo "::set-output name=timestamp::$(date +"%s")"
+        run: echo "::setOutput name=timestamp::$(date +"%s")"
 
       - name: Setup Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ${{ env.CACHE_DIR }}
